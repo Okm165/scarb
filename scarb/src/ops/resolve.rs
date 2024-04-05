@@ -214,22 +214,22 @@ fn generate_cairo_compilation_units(
             let packages = solution.packages.as_ref().unwrap();
             let cairo_plugins = solution.cairo_plugins.as_ref().unwrap();
 
-            let mut requested_feature_opts = HashMap::<PackageId, FeaturesOpts>::new();
-            for (package_id, summary) in solution.resolve.resolve.summaries.iter() {
+            let mut requested_feature_opts = HashMap::<PackageName, FeaturesOpts>::new();
+            for (_, summary) in solution.resolve.resolve.summaries.iter() {
                 for dependence in summary.dependencies.iter() {
                     let requested = FeaturesOpts::new(
                         FeaturesSelector::Features(dependence.enabled_features.to_owned()),
                         dependence.no_default_features,
                     );
                     requested_feature_opts
-                        .entry(*package_id)
+                        .entry(dependence.name.clone())
                         .and_modify(|feature_opts| {
                             *feature_opts = feature_opts.merge(&requested);
                         })
                         .or_insert(requested);
                 }
             }
-
+            
             let cfg_set = build_cfg_set(member_target);
 
             let props: TestTargetProps = member_target.props()?;
@@ -279,7 +279,7 @@ fn generate_cairo_compilation_units(
                                 .collect();
 
                             if let Some(requested_features) =
-                                requested_feature_opts.get(&package.id)
+                                requested_feature_opts.get(&package.id.name)
                             {
                                 get_cfg_with_features(
                                     component_cfg_set.clone(),

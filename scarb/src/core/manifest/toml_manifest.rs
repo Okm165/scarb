@@ -1026,7 +1026,7 @@ impl DetailedTomlDependency {
             (Some(_), None, None, Some(url)) => SourceId::for_registry(url)?,
             (Some(_), None, None, None) => SourceId::default(),
         };
-
+        
         let enabled_features = self.enabled_features.to_owned().unwrap_or_default();
         let no_default_features = self.no_default_features.to_owned().unwrap_or_default();
 
