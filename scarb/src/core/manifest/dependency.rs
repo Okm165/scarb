@@ -6,6 +6,8 @@ use typed_builder::TypedBuilder;
 
 use crate::core::{DependencyVersionReq, PackageId, PackageName, SourceId, Summary, TargetKind};
 
+use super::FeatureName;
+
 /// See [`ManifestDependencyInner`] for public fields reference.
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct ManifestDependency(Arc<ManifestDependencyInner>);
@@ -21,6 +23,10 @@ pub struct ManifestDependencyInner {
     pub source_id: SourceId,
     #[builder(default)]
     pub kind: DepKind,
+    #[builder(default)]
+    pub enabled_features: Vec<FeatureName>,
+    #[builder(default)]
+    pub no_default_features: bool,
 }
 
 #[derive(Clone, Default, Eq, PartialEq, Hash)]

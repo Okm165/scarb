@@ -271,6 +271,8 @@ pub struct DetailedTomlDependency {
     pub branch: Option<String>,
     pub tag: Option<String>,
     pub rev: Option<String>,
+    pub enabled_features: Option<Vec<FeatureName>>,
+    pub no_default_features: Option<bool>,
 
     pub registry: Option<Url>,
 }
@@ -1024,12 +1026,17 @@ impl DetailedTomlDependency {
             (Some(_), None, None, Some(url)) => SourceId::for_registry(url)?,
             (Some(_), None, None, None) => SourceId::default(),
         };
+        
+        let enabled_features = self.enabled_features.to_owned().unwrap_or_default();
+        let no_default_features = self.no_default_features.to_owned().unwrap_or_default();
 
         Ok(ManifestDependency::builder()
             .name(name)
             .source_id(source_id)
             .version_req(version_req)
             .kind(dep_kind)
+            .enabled_features(enabled_features)
+            .no_default_features(no_default_features)
             .build())
     }
 }

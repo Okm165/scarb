@@ -2,6 +2,7 @@ use anyhow::{anyhow, Context, Error, Result};
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_compiler::diagnostics::DiagnosticsError;
 use cairo_lang_utils::Upcast;
+use gix::hashtable::hash_set::HashSet;
 use indoc::formatdoc;
 use itertools::Itertools;
 
@@ -28,6 +29,29 @@ pub enum FeaturesSelector {
 pub struct FeaturesOpts {
     pub features: FeaturesSelector,
     pub no_default_features: bool,
+}
+
+impl FeaturesOpts {
+    pub fn new(features: FeaturesSelector, no_default_features: bool) -> Self {
+        Self {
+            features,
+            no_default_features,
+        }
+    }
+
+    pub fn merge(&self, other: &Self) -> Self {
+        Self {
+            features: match (&self.features, &other.features) {
+                (FeaturesSelector::Features(f1), FeaturesSelector::Features(f2)) => {
+                    let mut merged_set: HashSet<FeatureName> = f1.iter().cloned().collect();
+                    merged_set.extend(f2.iter().cloned());
+                    FeaturesSelector::Features(merged_set.into_iter().collect())
+                }
+                _ => FeaturesSelector::AllFeatures,
+            },
+            no_default_features: self.no_default_features || other.no_default_features,
+        }
+    }
 }
 
 impl TryFrom<FeaturesSpec> for FeaturesOpts {

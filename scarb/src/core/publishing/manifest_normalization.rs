@@ -134,6 +134,8 @@ fn generate_dependency(dep: &ManifestDependency) -> Result<TomlDependency> {
         branch: None,
         tag: None,
         rev: None,
+        enabled_features: None,
+        no_default_features: None,
 
         // Unless it is default registry, expand registry specification to registry URL.
         //
